@@ -1,4 +1,4 @@
-import requests  # install this package
+import requests
 import json
 from flask import Flask, jsonify, request
 
