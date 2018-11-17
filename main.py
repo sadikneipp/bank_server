@@ -1,14 +1,20 @@
 import requests  # install this package
 import json
+import time
 from flask import Flask, jsonify, request
+
 
 app = Flask(__name__)
 
+
+AUTH_THRESH = 60
 state = {
     'john': 3000,
     'mary': 200,
     'joe': 0
 }
+
+auth = time.time() - 70
 
 @app.route('/authenticate/', methods=['GET', 'POST'])
 def authenticate():
@@ -31,7 +37,15 @@ def authenticate():
     return jsonify({'auth': 1})
 
 def phone_auth():
-    return True
+    if time.time() - auth < AUTH_THRESH:
+        return True
+    
+    return False
+
+@app.route('/ping/', methods=['GET', 'POST'])
+def ping():
+    auth = time.time()
+    print('Pinged!')
 
 
 
