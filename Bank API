@@ -8,9 +8,17 @@ t_name = 'Deon Volkman'
 
 def transform_id(api_id, t_name):
 
-    # WIP
+    result = 0
+    url = 'http://api.reimaginebanking.com/customers?key={}'.format(api_id)
+    f_name, l_name = t_name.split(' ')
 
-    return '5bf01b31322fa06b67794092'
+    output = requests.get(url)
+    list = output.json()
+    for n in range(list.len()):
+        if (list[n]['first_name'] == f_name) and (list[n]['first_name'] == l_name):
+            result = list['_id']
+
+    return result
 
 def proceed_request(cus_id, api_id, payload_type, payload_accname, amount, points, transfer_id):
 
