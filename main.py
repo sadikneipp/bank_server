@@ -1,20 +1,15 @@
-import requests  # install this package
+import requests
 import json
-import time
 from flask import Flask, jsonify, request
-
 
 app = Flask(__name__)
 
-
-AUTH_THRESH = 60
 state = {
-    'john': 3000,
-    'mary': 200,
-    'joe': 0
+    'john': {'balance': 3000, 'credit': 999, 'rewards': 1337},
+    'mary': {'balance': 200, 'credit': 700, 'rewards': 500},
+    'leonard': {'balance': 0, 'credit': 100, 'rewards': 1}
 }
 
-auth = time.time() - 70
 
 @app.route('/authenticate/', methods=['GET', 'POST'])
 def authenticate():
@@ -22,43 +17,45 @@ def authenticate():
     source = data['source']
     target = data['target']
     value = data['value']
+    type = data['type']
 
-    if state[source] < value:
-        return jsonify({'auth': 0})
-    
-    if not phone_auth():
-        return jsonify({'auth': 0})
-    
-    state[source] -= value
-    state[target] += value
+    # Make a transfer
+    if type == 'transfer':
+        if state[source] < value:
+            return jsonify({'auth': 0})
 
-    print(state)
-    
-    return jsonify({'auth': 1})
+        if not phone_auth():
+            return jsonify({'auth': 0})
+
+        state[source] -= value
+        state[target] += value
+
+        print(state)
+
+        return jsonify({'auth': 1})
+    # Check users' current balance
+    elif type == 'balance':
+        return state[source]['balance']
+    # Check users' credit score
+    elif type == 'credit_score':
+        return state[source]['credit']
+    # Check users' reward score
+    elif type == 'reward_points':
+        return state[source]['rewards']
+
 
 def phone_auth():
-    if time.time() - auth < AUTH_THRESH:
-        return True
-    
-    return False
-
-@app.route('/ping/', methods=['GET', 'POST'])
-def ping():
-    auth = time.time()
-    print('Pinged!')
-
-
+    return True
 
 # def transform_id(api_id, t_name):
 #     result = 0
 #     url = 'http://api.reimaginebanking.com/customers?key={}'.format(api_id)
 #     f_name, l_name = t_name.split(' ')
 
-#     output = requests.get(url)
-#     account_list = output.json()
+#     account_list = requests.get(url).json()
 #     for n in range(account_list.len()):
 #         if (account_list[n]['first_name'] == f_name) and (account_list[n]['first_name'] == l_name):
-#             result = account_list['_id']
+#             result = account_list[n]['_id']
 
 #     return result
 
@@ -69,9 +66,9 @@ def ping():
 #     # Create a Savings Account
 #     if payload_type == 'Savings':
 #         payload = {
-#             "type": payload_type,  # types: transfer!, creation of new account,
-#             "nickname": payload_accname,  # the name of the account being used
-#             "rewards": points,  # reward points
+#             "type": payload_type,
+#             "nickname": payload_accname,
+#             "rewards": points,
 #             "balance": amount,
 #         }
 #         response = requests.post(
@@ -80,15 +77,15 @@ def ping():
 #             headers={'content-type': 'application/json'},
 #          )
 #         if response.status_code == 201:
-#             print('Account created')
+#             return 'Account created'
 #         else:
-#             print('Transfer Failed')
+#             return 'Account creation failed')
 
 #     # Make a Transfer
 #     elif payload_type == 'Transfer':
 #         payload = {
-#             "type": payload_type,  # types: transfer!, creation of new account,
-#             "nickname": payload_accname,  # the name of the account being used
+#             "type": payload_type,
+#             "nickname": payload_accname,
 #             "balance": amount,
 #             "transfer": transfer_id,  # id of the receiving account
 #         }
@@ -98,18 +95,28 @@ def ping():
 #             headers={'content-type': 'application/json'},
 #          )
 #         if response.status_code == 202:
-#             print('Transfer Executed')
+#             return 'Transfer executed'
 #         else:
-#             print('Transfer Failed')
+#             return 'Transfer failed'
 #     else:
-#         return 0
+#         return 'Transfer request failed'
 
-#     return 0
+#     # Check the balance of an account
+#     elif payload_type == 'Balance':
+#         acc_details = requests.get(url).json()
+#         for n in range(acc_details.len()):
+#             if (acc_details[n]['nickname'] == payload_accname)):
+#                 result = acc_details[n]['balance']
+#                 return 'Current balance is '+result+' '+acc_details[n]['currency']
+#         return 'Account balance is unavailable'
+#     else:
+#         return 'Request type not supported'
+
+#     return 'Request failed'
 
 
-# if __name__ == "__main__":  # only runs when this script is called directly as opposed to from another script
+# if __name__ == "__main__":
 
 #     t_id = transform_id(key, t_name)
-#     proceed_request(id, key, 'Savings', 'test', 10, 0, t_id)
-
+#     proceed_request(id, key, 'Savings', 'test', 10, 0, t_id) # Parameters taken from Alexa App
 
