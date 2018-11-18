@@ -124,7 +124,9 @@ def ping():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
-        
+
+# sample operations if the API documentation had worked     
+
 # def transform_id(api_id, t_name):
 #     result = 0
 #     url = 'http://api.reimaginebanking.com/customers?key={}'.format(api_id)
