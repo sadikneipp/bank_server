@@ -27,8 +27,8 @@ def authenticate():
         if not phone_auth():
             return jsonify({'auth': 0})
 
-        state[source] -= value
-        state[target] += value
+        state[source]['balance'] -= value
+        state[target]['balance'] += value
 
         print(state)
 
