@@ -17,10 +17,10 @@ def authenticate():
     source = data['source']
     target = data['target']
     value = data['value']
-    type = data['type']
+    operation = data['operation']
 
     # Make a transfer
-    if type == 'transfer':
+    if operation == 'transfer':
         if state[source] < value:
             return jsonify({'auth': 0})
 
@@ -34,13 +34,13 @@ def authenticate():
 
         return jsonify({'auth': 1})
     # Check users' current balance
-    elif type == 'balance':
+    elif operation == 'balance':
         return state[source]['balance']
     # Check users' credit score
-    elif type == 'credit_score':
+    elif operation == 'credit_score':
         return state[source]['credit']
     # Check users' reward score
-    elif type == 'reward_points':
+    elif operation == 'reward_points':
         return state[source]['rewards']
 
 
@@ -59,14 +59,14 @@ def phone_auth():
 
 #     return result
 
-# def proceed_request(cus_id, api_id, payload_type, payload_accname, amount, points, transfer_id):
+# def proceed_request(cus_id, api_id, payload_operation, payload_accname, amount, points, transfer_id):
 
 #     url = 'http://api.reimaginebanking.com/customers/{}/accounts?key={}'.format(cus_id, api_id)
 
 #     # Create a Savings Account
-#     if payload_type == 'Savings':
+#     if payload_operation == 'Savings':
 #         payload = {
-#             "type": payload_type,
+#             "operation": payload_operation,
 #             "nickname": payload_accname,
 #             "rewards": points,
 #             "balance": amount,
@@ -74,7 +74,7 @@ def phone_auth():
 #         response = requests.post(
 #             url,
 #             data=json.dumps(payload),
-#             headers={'content-type': 'application/json'},
+#             headers={'content-operation': 'application/json'},
 #          )
 #         if response.status_code == 201:
 #             return 'Account created'
@@ -82,9 +82,9 @@ def phone_auth():
 #             return 'Account creation failed')
 
 #     # Make a Transfer
-#     elif payload_type == 'Transfer':
+#     elif payload_operation == 'Transfer':
 #         payload = {
-#             "type": payload_type,
+#             "operation": payload_operation,
 #             "nickname": payload_accname,
 #             "balance": amount,
 #             "transfer": transfer_id,  # id of the receiving account
@@ -92,7 +92,7 @@ def phone_auth():
 #         response = requests.post(
 #             url,
 #             data=json.dumps(payload),
-#             headers={'content-type': 'application/json'},
+#             headers={'content-operation': 'application/json'},
 #          )
 #         if response.status_code == 202:
 #             return 'Transfer executed'
@@ -102,7 +102,7 @@ def phone_auth():
 #         return 'Transfer request failed'
 
 #     # Check the balance of an account
-#     elif payload_type == 'Balance':
+#     elif payload_operation == 'Balance':
 #         acc_details = requests.get(url).json()
 #         for n in range(acc_details.len()):
 #             if (acc_details[n]['nickname'] == payload_accname)):
@@ -110,7 +110,7 @@ def phone_auth():
 #                 return 'Current balance is '+result+' '+acc_details[n]['currency']
 #         return 'Account balance is unavailable'
 #     else:
-#         return 'Request type not supported'
+#         return 'Request operation not supported'
 
 #     return 'Request failed'
 
