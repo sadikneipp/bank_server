@@ -24,9 +24,11 @@ def authenticate():
     value = data['value']
 
     if state[source] < value:
+        print('no funds!')
         return jsonify({'auth': 0})
     
     if not phone_auth():
+        print('no two factor')
         return jsonify({'auth': 0})
     
     state[source] -= value
@@ -37,19 +39,23 @@ def authenticate():
     return jsonify({'auth': 1})
 
 def phone_auth():
-    if time.time() - auth < AUTH_THRESH:
+    delta = time.time() - auth
+    print(delta)
+    if delta <= AUTH_THRESH:
         return True
     
     return False
 
-@app.route('/ping/', methods=['GET', 'POST'])
+@app.route('/ping/', methods=['GET', 'POST', 'OPTIONS'])
 def ping():
+    global auth
     auth = time.time()
+    print(time.time() - auth)
     print('Pinged!')
+    return 'pinged'
 
-
-
-# def transform_id(api_id, t_name):
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
 #     result = 0
 #     url = 'http://api.reimaginebanking.com/customers?key={}'.format(api_id)
 #     f_name, l_name = t_name.split(' ')
